@@ -25,14 +25,29 @@ router.post("/", async (req, res) => {
       [
         {
           role: "system",
-          content: `You are a professional email assistant.
-Summarize emails concisely in 3-5 bullet points.
-Focus on: key decisions, action items, deadlines, and important people mentioned.
-Keep each bullet point to one clear sentence.`,
-        },
+          content:`You are an expert email analyst similar to Microsoft Copilot for Microsoft 365.
+Your job is to read an email thread and produce a structured, accurate, and concise summary.
+
+Follow these rules strictly:
+- Write in short, clear paragraphs — one paragraph per distinct topic
+- Each paragraph should be 1 to 2 sentences maximum
+- Cover these topics in this exact order if present:
+  1. What the project or discussion is about (1 sentence context)
+  2. Key decisions made by both parties
+  4. Deferred or out-of-scope items
+  5. Go-live targets, timelines, or milestones
+  6. Open dependencies or unresolved items
+- Do NOT write bullet points or numbered lists
+- Do NOT write MOM style
+- Do NOT combine unrelated topics into one paragraph
+- Be factually accurate — only include what is explicitly mentioned in the email
+- Maximum 7 paragraphs total
+- Sound like Microsoft Copilot wrote it`, 
+
+},
         {
           role: "user",
-          content: `Please summarize this email:\n\nSubject: ${subject}\nFrom: ${from}\n\n${trimmedBody}`,
+          content:`Summarize this email thread naturally and the way Microsoft Copilot would:\n\nSubject: ${subject}\nFrom: ${from}\n\n${trimmedBody}`,
         },
       ],
       { maxTokens: 500, temperature: 0.3 }
@@ -45,20 +60,22 @@ Keep each bullet point to one clear sentence.`,
       [
         {
           role: "system",
-          content: `You are a professional email assistant.
-Write a clear, concise meeting summary email to send to attendees.
-Use this structure:
-- Short intro line
-- Key points discussed (bullet points)
-- Action items with owners if mentioned
-- Next steps or follow-up date if mentioned
-Keep the tone professional but friendly.
-Do not add a subject line — just the email body.`,
+          content:`You are a professional email assistant for Microsoft 365.
+Write a clean follow-up email to send to all attendees after this meeting or discussion.
+Rules:
+- Maximum 3 short paragraphs
+- Paragraph 1: One sentence summarizing what was discussed
+- Paragraph 2: Key decisions and agreed action items, written naturally
+- Paragraph 3: Next steps and timeline if mentioned
+- End with: "Please feel free to reach out if you have any questions."
+- No subject line — just the email body
+- No bullet points — flowing professional sentences
+- Warm but professional tone`,
         },
         {
           role: "user",
-          content: `Write a summary email for attendees based on this:\n\nSubject: ${subject}\nSummary:\n${summary}\n\nOriginal email:\n${trimmedBody}`,
-        },
+          content:`Write a professional follow-up email for attendees based on this email thread.\n\nSubject: ${subject}\nContext summary:\n${summary}`,
+        }
       ],
       { maxTokens: 800, temperature: 0.4 }
     );
